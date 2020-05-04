@@ -1,0 +1,94 @@
+---
+title: "Reproducible Research Notes"
+author: "Coursera Course by John Hopkins University"
+date: "INSTRUCTORS: Dr. Jeff Leek, Dr. Roger D. Peng, Dr. Brian Caffo"
+fontsize: 11pt
+output: 
+        pdf_document:
+                toc: true
+                toc_depth: 3
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Intro  
+# Concepts, Ideas, & Structure  
+## Concepts and Ideas (Part 1)  
+## Concepts and Ideas (Part 2)  
+## Concepts and Ideas (Part 3)  
+
+**Reminder to commit, delete this line** ***AFTER*** **committing**  
+
+## Scipting Your Analysis  
+## Structure of a Data Analysis (Part 1)  
+## Structure of a Data Analysis (Part 2)  
+## Organizing Your Analysis  
+
+**Reminder to commit, delete this line** ***AFTER*** **committing**  
+
+## Quiz 1  
+
+
+**Reminder to commit, delete this line** ***AFTER*** **committing**  
+
+# Markdown & knitr  
+## Coding Standards in R  
+## Markdown  
+## R Markdown  
+## R Markdown Demo  
+
+**Reminder to commit, delete this line** ***AFTER*** **committing**  
+
+## knitr (Part 1)    
+## knitr (Part 2)  
+## knitr (Part 3)  
+## knitr (Part 4)  
+
+**Reminder to commit, delete this line** ***AFTER*** **committing**  
+
+## Quiz 2  
+
+
+**Reminder to commit, delete this line** ***AFTER*** **committing**  
+
+# Course Project 1  
+
+**Reminder to commit, delete this line** ***AFTER*** **committing**  
+
+# Reproducible Research Checklist & Evidence-based Data Analysis  
+## Communicating Results  
+## RPubs  
+
+**Reminder to commit, delete this line** ***AFTER*** **committing**  
+
+## Reproducible Research Checklist (Part 1)  
+## Reproducible Research Checklist (Part 2)  
+## Reproducible Research Checklist (Part 3)  
+
+**Reminder to commit, delete this line** ***AFTER*** **committing**  
+
+## Evidence-based Data Analysis (Part 1)  
+## Evidence-based Data Analysis (Part 2)  
+## Evidence-based Data Analysis (Part 3)  
+## Evidence-based Data Analysis (Part 4)  
+## Evidence-based Data Analysis (Part 5)  
+
+**Reminder to commit, delete this line** ***AFTER*** **committing**  
+
+# Case Studies & Commentaries  
+## Caching Computations  
+## Case Study: Air Pollution  
+
+**Reminder to commit, delete this line** ***AFTER*** **committing**  
+
+## Case Study: High Throughput Biology  
+## Commentaries on Data Analysis  
+
+**Reminder to commit, delete this line** ***AFTER*** **committing**  
+
+# Course Project 2
+
+
+**Reminder to commit, delete this line** ***BEFORE*** **committing**  
