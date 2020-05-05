@@ -151,14 +151,332 @@ Limitations:
 * There is a growing number of tools for creating reproducible documents  
 
 ## Scipting Your Analysis  
-## Structure of a Data Analysis (Part 1)  
-## Structure of a Data Analysis (Part 2)  
+* Scripting everything helps make your work as reproducible as possible  
+* In the past one may have written everything down in a lab notebook, but now with computers we document everything with scripts in computers  
+* To make an analogy to music, the final paper/presentation is like the melody, but the exploratory work is like the supporting instruments in a song  
+* Simular to a score in music we need a way to document everything that's going on in an analysis, this is the script  
+
+
+
+## Structure of a Data Analysis (Part 1): Defining to Cleaning  
+* General steps in a data analysis:
+  + Define the question  
+  + Define the ideal data set  
+  + Determine what data you can access  
+  + Obtain the data  
+  + Clean the data  
+  + Exploratory data analysis  
+  + Statistical prediciton/modeling  
+  + Interpret results  
+  + Challenge results  
+  + Synthesize/write up results  
+  + Create reproducible code  
+  
+"*Ask yourselves, what problem have you solved, ever, that was worth solving, where you knew all fo the given information in advance? Where you* ***didn't*** *have a surplus of information and have to filter it out, or you had insufficent information and have to go find some?*" - Dan Myer, Maths Educator; **[TED talk "Math class needs a makeover"](https://www.youtube.com/watch?v=qocAoN4jNwc)**  
+
+* A lot of the process of data analysis is filtering through all the information  
+
+### Defining a question  
+* The more effort you can put into coming up with a reasonable question, the less effort you'll have to spend sorting through a lot of stuff; most powerful dimension reduction tool you can employ.
+* Narrowing down question will reduce potential noise in a large data set  
+* The science will determine the question, leading to the data, leading to the applied statistics, from here one could develop theoretical statistics should their skill allow  
+* The applied statistics have to be thoruhgly thought through to use the appropriate methods to make some conclusion  
+
+An example:
+* Start with a general question  
+  + Can I automatically detect emails that are SPAM and those that are not?
+(Side Note: SPAM email comes from a reference to **[this Monty Python sketch](https://vimeo.com/329001211)**, as such legit email is classified as "HAM")  
+
+* Make it concrete  
+  + Can I use quantitative characteristics of the emails to classify them as SPAM/HAM?  
+  
+### Define the ideal data set  
+* The data set may depend on your goal  
+  + Descriptive - a whole population  
+    - Ex: All of the emails in the universe  
+  + Exploratory - a random sample with many variables measured  
+  + Inferential - the right population, randomly sampled  
+    - Have to be careful of the sampling mechanism and the population you're drawing from  
+  + Predictive - a training and test data set from the same population  
+  + Causal - data from a randomized study  
+    - "If I modify this compenet, something else will happen  
+  + Mechanistic - data about all components of the system  
+  
+Our example:  
+* One could get all the emails **[from googles datacenter](http://www.google.com/about/datacenters/inside)**
+
+### Determine what data you can access  
+* Sometimes you can find data free on the web  
+* other times you may need to buy the data  
+* Be sure to respect the terms of use  
+* If the data don't exist, you may need to generate it yourself  
+
+Our example:  
+* Google's data center security is quite high and getting *everyone's* emails would be releasing some personal information so we'll probably have to go with something else, **[since Google isn't evil](https://en.wikipedia.org/wiki/Don't_be_evil)**  
+
+* A possible solution is to use **[the Spambase dataset](http://archive.ics.uci.edu/ml/datasets/Spambase)**  
+
+
+### Obtain the data  
+* Try to obtain the raw data  
+* Be sure to reference the source  
+* Polite emails go a long way if you need data from someone  
+* If you will load the data from an internet source, record the url and time accessed  
+  
+**(Data set for our example comes with the kernlab package.)[http://search.r-project.org/library/kernlab/html/spam.html]** How the data was previously processed is also documented in that link.  
+
+### Clean the data  
+* Raw data often needs to be processed  
+* If it is pre-processed, make sure you understand how  
+* Understand the source of the data (sensus, sample, convenience sample, etc.)  
+* May need reformating, subsampling - record these steps so they can be reproduced  
+* **Determine if the data are good enough** - if not, quit or change data  
+
+Out cleaned data set  
+```{r}
+library(kernlab)
+data(spam)
+str(spam[, 1:5])
+```
+
+
+
+
+## Structure of a Data Analysis (Part 2): Exploring to Creating Reproducible Code  
+### Subsampling our data into test & train sets  
+```{r}
+library(kernlab)
+data(spam)
+set.seed(3435)
+trainIndicator <- rbinom(nrow(spam), size = 1, prob = 0.5)
+table(trainIndicator)
+trainSpam <- spam[trainIndicator == 1, ]
+testSpam <-  spam[trainIndicator == 0, ]
+```
+
+### Exploratory data analysis  
+* Look at summaries of the data  
+* Check for missing data  
+* Create exploratory plots  
+* Perform exploratory analyses (e.g. clustering)  
+
+```{r}
+#Checkin' out data
+names(trainSpam)
+head(trainSpam) #freq of words in emails
+```
+
+```{r}
+#Look at some plots
+plot(trainSpam$capitalAve ~ trainSpam$type)#Avg capital letters
+#Data is hard to see so looking at the log will help
+plot(log10(trainSpam$capitalAve + 1) ~ trainSpam$type) 
+# add 1 to evaluate 0s - ok for exploring, not reports
+```
+* The second plot helps us see the freq of capitals in spam is higher than in nonspam  
+
+Relationships between predictors:  
+```{r}
+plot(log10(trainSpam[, 1:4] + 1))
+```
+* Words in the diagonal tell what predictor those respective rows & cols are looking at  
+  + Referred to as a "Paris plot"  
+  
+Clustering:  
+```{r}
+hCluster = hclust(dist(t(trainSpam[, 1:57])))
+plot(hCluster)
+```
+* not very informative since info is skewed, so clustering a log might give a better insight  
+
+```{r}
+hClusterUpdated <- hclust(dist(t(log10(trainSpam[, 1:55] + 1))))
+plot(hClusterUpdated)
+```
+
+### Statistical prediction/modeling  
+* Should be informed by the sefults of your exploratory analysis  
+* Exact methods depend on the question of interest  
+* Transformations/processing should be accounted for when necessary  
+* Measures of uncertainty should be reported  
+Example:  
+```{r echo = TRUE, include = FALSE}
+# Use a logistic regression to determine which variable has the min  
+# error from the regression
+trainSpam$numType <- as.numeric(trainSpam$type) - 1
+costFunction = function(x, y) sum(x != (y > 0.5))
+cvError = rep(NA, 55)
+library(boot)
+
+for (i in 1:55) {
+  lmFormula = reformulate(names(trainSpam)[i], response = "numType")
+  glmFit = glm(lmFormula, family = "binomial", data = trainSpam)
+  cvError[i] = cv.glm(trainSpam, glmFit, costFunction, 2)$delta[2]
+}
+#The above loop was causing a spew of warnings so I segmented the parts that
+#include output to hide these warnings
+
+```
+```{r}
+#Which predictor has minimum cross-validated error?
+names(trainSpam)[which.min(cvError)]
+```
+
+Get a measure of uncertainty  
+```{r}
+## Use the best model from the group
+predictionModel = glm(numType ~ charDollar, 
+                      family = "binomial", data = trainSpam)
+
+## Get predictions on the test set
+predictionTest = predict(predictionModel, testSpam)
+predictedSpam = rep("nonspam", dim(testSpam)[1])
+
+## Arb. Classify as 'spam' for those with prob > 0.5
+predictedSpam[predictionModel$fitted > 0.5] = "spam"
+head(predictedSpam)
+```
+
+Get a measure of uncertainty  
+```{r}
+## Classification table
+result <- table(predictedSpam, testSpam$type)
+result
+## Error rate
+errors <- result[1,2] + result[2,1]
+total <- sum(result[1:2,1:2])
+print(paste0(errors, " errors occured out of ", 
+      total, " readings resulting in an error rate of ",
+      round(errors/total, 4)))
+```
+
+### Interpret results  
+* Use the appropriate language  
+  + "describes"  
+  + "correlates with/associated with"  
+  + "leads to/causes"  
+  + "predicts"  
+* Give an explanation  
+* Interpret coefficients  
+* Interpret measures of uncertainty  
+
+In our example:
+* The fraction of chacters that are dollar signs can be used to predict if an email is Spam  
+* Anything with more than 6.6% dollar signs is classified as Spam  
+* More dollar signs always means more Spam under our prediction  
+* Our test set error rate was 22.4%
+
+### Challenge Results  
+* Challenge all steps:
+  + Question  
+  + Data source  
+  + Processing  
+  + Analysis  
+  + Conclusions  
+* Challenge measures of uncertainty  
+* Challenge choices of terms to include in models  
+* Think of potential alternative analyses  
+
+### Synthesize/write-up results  
+* Lead with the question  
+* Summarize the analyses into the story  
+* Don't include every analysis, include it:  
+  + If it is needed for the story  
+  + If it is needed to address a challenge  
+* Order analyses according to the story, rather than chronologically  
+* Include "pretty" figures that contribute to the story  
+
+In our example:
+* Lead with the question  
+  + "*Can I use quantitative characteristics of the emails to classify them as SPAM/HAM?*"  
+* Describe the approach  
+  + Collected data from UCI -> created training/test sets  
+  + Explored relationships  
+  + Choose logistic model on training set by cross validation  
+  + Applied to test, 78% test set accuracy  
+* Interpret results  
+  + Number of dollar signs seems reasonable, e.g. "Make money with Viagra \$ \$ \$ \$!"
+* Challenge results  
+  + 78% isn't that great  
+  + I could use more variables  
+  + Why logistic regression?
+  
+
+
+
 ## Organizing Your Analysis  
+* No universal way for every data analysis, however this lecture aims to give some useful tips  
 
-**Reminder to commit, delete this line** ***AFTER*** **committing**  
+### Types of Data Analysis Files  
+* Data  
+  + Raw data  
+  + Processed data  
+* Figures  
+  + Exploratory figures - not very polished  
+  + Final figures  
+* R code  
+  + Raw / unused scripts  
+  + Final scripts - easier to read, commented  
+  + R Markdown files  
+* Text  
+  + README files  
+  + Text of analysis / report  
+  
+### Raw Data  
+* Should be stored in your analysis folder  
+* If accessed fromt he web, include url, description, and date accessed in README  
+* Adding raw data to Git repo is good, however sometimes these files are too large to be stored on GitHub  
 
-## Quiz 1  
+### Processed Data  
+* Processed data should be named files so it is easy to see which script generated the data  
+* The processing script - processed data mapping should occur in the README  
+* Processed data should be **tidy**  
 
+### Exploratory Figures  
+* Figures made during the course of your analysis, not necessarily part of your final report  
+* They do not need to be "pretty"  
+
+### Final Figures  
+* Usually a small subset of the original, exploratory figures  
+* Axes/colors set to make the figure clear  
+* Possibly multiple panels (helps to condence related info)  
+* Labeled well and annotated to help readers understand what's going on with the data  
+
+### Raw Scripts  
+* May be less commented (although comments do help you)  
+* May be multiple versions  
+* May include analyses that are later discarded since they lead to a dead-end  
+
+### Final Scripts  
+* Clearly commented  
+  + Small comments liberally - aim to answer the "what, when, why, and how"s  
+  + Bigger commented blocks for whole sections of code  
+* Include processing details  
+* Only analyses that appear in the final write-up, helps others view the process and reproduce  
+
+### R Markdown Files  
+*(Is this where I say something about all these notes being in R Markdown?)*  
+* R markdown files (`.Rmd`) can be used to generate repoducible reports  
+* Text and R code are integrated in one document  
+* Very easy to create in `Rstudio`  
+
+### README files  
+* Explain what's going on in the directory  
+* Not necessary if you use R markdown files, as those ussually will be stating what's going on as code is executed  
+* Should contain step-by-step instructions for analysis  
+* **[Here is an example](https://github.com/jtleek/swfdr/blob/master/README.md)**  
+
+### Text of the document  
+* It should include a title, introduction (motivation), methods (statistics you used), results (including measures of uncertainty), and conclusions (including potential problems)  
+* It should tell a story  
+* *It should not include every analysis you performed*  
+* References should be incldued for statistical methods  
+
+### Further Resources  
+* Information about a non-reproducible study that led to cancer patients being mistreated: **[The Duke Saga Starter Set](http://simplystatistics.org/2012/02/27/the-duke-saga-starter-set/)**  
+* **[Reproducible research and Biostatistics](http://biostatistics.oxfordjournals.org/content/10/3/405.full)**  
+* **[Managing a statistical analysis project guidelines and best practices](http://www.r-statistics.com/2010/09/managing-a-statistical-analysis-project-guidelines-and-best-practices/)**  
+* **[Project template](http://projecttemplate.net/)** - a pre-organized set of files for data analysis
 
 **Reminder to commit, delete this line** ***AFTER*** **committing**  
 
