@@ -478,7 +478,6 @@ In our example:
 * **[Managing a statistical analysis project guidelines and best practices](http://www.r-statistics.com/2010/09/managing-a-statistical-analysis-project-guidelines-and-best-practices/)**  
 * **[Project template](http://projecttemplate.net/)** - a pre-organized set of files for data analysis
 
-**Reminder to commit, delete this line** ***AFTER*** **committing**  
 
 # Markdown & knitr  
 ## Coding Standards in R  
@@ -492,8 +491,6 @@ In our example:
 ## knitr (Part 2)  
 ## knitr (Part 3)  
 ## knitr (Part 4)  
-
-**Reminder to commit, delete this line** ***AFTER*** **committing**  
 
 ## Quiz 2  
 
