@@ -481,7 +481,93 @@ In our example:
 
 # Markdown & knitr  
 ## Coding Standards in R  
+* Help make code readable so both you and others can read what your code does  
+* Just like any other style, such as clothing, not everyone will agree on the basic ideas but this lecture will cover some of the standards  
+
+1) Save code as text files  
+* Easily interpertable by all devices  
+* RStudio does this by default  
+
+2) Indent your code  
+* Separates sections of code, such as loops & functions  
+* Amount a tab width is is up for debate, but old-schoolers like a width of 8, but a width of 4 is considered a minimum  
+
+3) Limit the width of your code  
+* 80 columns is standard  
+* Code can be concisely viewed without annoying horizontal scrolling  
+* Also helps avoid issues with code readability when combined with indenting standards, a 4 nested for loop will start hitting the right margin  
+
+4) Limit the length of individual functions  
+* Each data should do one basic activity
+  + `readData(filename)` should just read the data and return the data.table  
+  + `readData(filename)` should **NOT** read, process, fit a model, and print some output  
+* Nice to have a function written on a single page of the code to be able to evaluate what it does  
+* Helps with finding bugs within a function  
+
+
 ## Markdown  
+* Simplified markup language  
+* Easy to integrate with R Code and other programming languages  
+
+"*Markdown is a text-to-HTML conversion tool for web writers. Markdown allows you to write using an easy-to-read, easy-to-write plain text format, then convert it to structurally valid XHTML (or HTML).*" - John Gruber, creator of Markdown  
+
+### Syntax  
+* Italics  
+  + \*This text will appear italicized\*   
+  + *This text will appear italicized*  
+
+* Bold  
+  + \*\*This text will appear bold!\*\*  
+  + **This text will appear bold!**  
+
+* Italics & Bold  
+  + \*\*\*This text will appear both italicized & bold\*\*\*  
+  + ***This text will appear both italicized & bold***  
+  
+* Headings  
+  + \#\# This is a secondary heading  
+  + \#\#\# This is a tertiary heading
+  + (Example has been ommitted as to not mess up TOC)  
+  
+* Unordered Lists
+  + Character doesn't matter, as long as it's consist  
+  + \* I use this for first bullet(Line above)  
+  + \+ These for second bullet(This line)  
+  + \- These for a third bullet
+    - Third Bullet  
+    
+* Ordered Lists  
+  + 1) first item  
+  + 2) second item  
+  + 3) third item  
+  1) first item  
+  2) second item  
+  3) third item  
+  + If you want to add something it just has to be a number followed by the same character, then markdown will order the numbers when it executes based on the inital number    
+  1. What if I like periods instead  
+  34. I forgot to add this line earlier and it starts with "`34.`"  
+  2. Yeah that's fine just use those  
+  3. Whatever you type shows up as is  
+  
+* Links (Ignore the `\` characters)  
+  + \\[Johns Hopkin Bloomberg School of Public Health\\]\\(http://www.jhsph.edu/ \\)  
+  + [Johns Hopkin Bloomberg School of Public Health](http://www.jhsph.edu/)  
+  + Underline isn't supported in pdfs so I developed the tecnique of bolding links
+    - \*\*\\[Download R\\]\\(http://www.r-project.org/ \\)\*\*  
+    - **[Download R](http://www.r-project.org/)**  
+
+* Advanced Linking  
+  + `I spend so much time reading [R bloggers] [1] and [Simply Statistics][2]!`  
+    `[1]: http://www.r-bloggers.com/`  
+    `[2]: http://simplystatistics.org/`
+    
+I spend so much time reading [R bloggers][1] and [Simply Statistics][2]!  
+[1]: http://www.r-bloggers.com/  
+[2]: http://simplystatistics.org/  
+
+
+
+
 ## R Markdown  
 ## R Markdown Demo  
 
