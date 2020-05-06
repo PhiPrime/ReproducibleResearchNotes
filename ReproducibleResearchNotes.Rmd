@@ -556,29 +556,184 @@ In our example:
     - \*\*\\[Download R\\]\\(http://www.r-project.org/ \\)\*\*  
     - **[Download R](http://www.r-project.org/)**  
 
-* Advanced Linking  
-  + `I spend so much time reading [R bloggers] [1] and [Simply Statistics][2]!`  
-    `[1]: http://www.r-bloggers.com/`  
-    `[2]: http://simplystatistics.org/`
-    
-I spend so much time reading [R bloggers][1] and [Simply Statistics][2]!  
-[1]: http://www.r-bloggers.com/  
-[2]: http://simplystatistics.org/  
-
-
-
+* Newlines require two spaces  
 
 ## R Markdown  
+### What is Markdown?  
+* Created by John Gruber and Aaron Swartz  
+* A simplified version of "markup" languages  
+* Allows one to focus on writing as opposed to formatting  
+* Simple/minimal intuitive formatting elements  
+* Easily converted to valid HTML (and other formats) using existing tools  
+* Complete information is available at **[this site](http://daringfireball.net/projects/markdown/)**  
+* **[Some background information](http://daringfireball.net/2004/03/dive_into_markdown)**  
+
+### What is R Markdown?  
+* R markdown is the integration of R code with markdown  
+* Allows one to create documents containing "live" R code  
+* R code is evaluated as part of the processing of the markdown  
+* Results from R code are inserted into markdown document  
+* A core tool in *literate statistical programming*  
+* R markdown can be converted to standard markdown using the `knitr` package in R  
+* Markdown can be converted to HTML using the `markdown` package in R  
+* Any basic text editor can be used to create a markdown document; no special editing tools are needed  
+* The R markdown --> markdown --> HTML 
+* Work flow can be easily managed using RStudio (but not required)  
+* Slides can be written in R markdown and converted using the `slidify` package  
+
+
+
+
 ## R Markdown Demo  
+This entire thing is made in R Markdown so just look at that related code for a demo.  
 
-**Reminder to commit, delete this line** ***AFTER*** **committing**  
 
-## knitr (Part 1)    
+## knitr (Part 1)  
+* Helps make analysis reproducible through literate statistical programming  
+  
+The problems that `knitr` aims to solve  
+* Authors must undertake considerable effor to put data/results on the web  
+* Readers must download data/results individually and piece together which data go with whcih code sections, etc.  
+* Authors/readers must manually interact with websites  
+* There is no single document to integrate data snalysis with textual representations; i. e. data, code, and text are not linked  
+
+### Literate Statistical Programming  
+* Literate Programming orginally came from Don Knuth  
+* An article is to be a stream of **text** and **code**  
+* Analysis code is divided into text and code "chunks"  
+* Presentation code formats results (tables, figures, etc.)  
+* Article text explains what is going on in the code sections  
+* Literate programs are **weaved** to produced human-readable documents and **tangled** to produce machine-readable documents  
+* Literate programming as a general concept needs:  
+  + A documentation language  
+  + A programming language  
+* The original **Sweave** system developed by Friedrich Leisch used LaTeX and R  
+* **knitr** supports a variety of documentation languages  
+
+### How do I Make My Work Reproducible?  
+* Decide to do it (ideally from the start)  
+  + Deciding at the end requries a lot of backtracking and reformatting  
+* Keep track fo things, perhaps with a version control system to track snapshots/changes  
+* Use software whose operation can be coded  
+  + This usually rules out and GUI software, unless it tracks what you click on  
+* Don't save output  
+  + Don't preprocess data and only keep clean data, as you won't have a record of how you created the clean data  
+* Save data in non-proprietary formats  
+  + formats where the layout of the data isn't publiclly known  
+  + makes difficult for others to access the data  
+
+### Pros and Cons  
+Pros  
+* Text and code are all in once place, in a logical order  
+* Data and results are automatically updated to reflect external changes  
+* Code is live/automatic when building a document. Helps you know if an error in the analysis has appeared  
+
+Cons  
+* Text and code all in one place; can make documents difficult to read, especially if there is a **lot** of code  
+* Can substantially slow down processing of documents (although there are tools to help)  
+
 ## knitr (Part 2)  
-## knitr (Part 3)  
-## knitr (Part 4)  
+### What is knitr?  
+* An R package written by Yihui Xie (while he was a grad student at Iowa State)  
+  + Available on CRAN  
+  + Built into RStudio  
+* Supports RMarkdown, LaTeX, and HTML as documentation languages  
+* Can export to PDF, HTML  
+* Built right into RStudio for your convenience  
+Requirements  
+* A recent version of R  
+* A text editor (the one that comes with RStudio is fine)  
+* Some support packages also available on CRAN  
+  + auto downloaded with `install.package()` function
+* Some knowledge of Markdown, LaTeX, or HTML  
 
-## Quiz 2  
+### What is knitr Good For?  
+* Manuals  
+* Short/medium-length technical documents  
+* Tutorials  
+* Reports (esp. if generated periodically)  
+* Data preprocessing documents/summaries  
+
+What it's not good for  
+* Very long research articles  
+  + Hard to edit  
+* Complex, time-consuming computations  
+  + has to rerun everytime you generate the document  
+* Documents that require precise formatting
+
+
+## knitr (Part 3)  
+This lecture covers how to make a knitr document  
+* Create a R Markdown document  
+* Right up Rmd code you want to use to generate the document  
+* Hit `Knit` in RStudio  
+* If not in RStudio:
+```{r eval = FALSE}
+library(knitr)
+setwd(<working directory>)
+knit2html("document.Rmd")
+browseURL("document.html")
+```
+
+### A few notes  
+* knitr will fill a new document with filler text; normally you just want to delete this  
+* Code chucks begin with \`\`\`{r} and end with \`\`\`  
+  + All R code goes in between these markers  
+* Code chunks can have **names**, which is useful when we start making graphics  
+\`\`\`{r firstchunk}  
+\#\# R code goes here  
+\`\`\`
+* By default, code in a code chunk is echoed, as will the results of the computation (if there are results to print)  
+
+## knitr (Part 4)  
+### Processing of knitr Documents  
+#### (What happens under the hood)  
+* You write the RMarkdown document (`.Rmd`)  
+* knitr produces a Markdown document (`.md`)  
+* knitr converts the Markdown document into HTML (by default)  
+* You should **NOT** edit (or save) the `.md` or `.html` documents until you are finished  
+
+### Inline Text Computations  
+```{r}
+time <- format(Sys.time(), "%a %b %d %X %Y")  
+rand <- rnorm(1)
+```
+* You can integrate values of object into a sentance by using *the grave key* followed by `r` to call to that object.  
+  + The current time is `r time`. A random number is `r rand`.  
+  
+### Some calls to add in the begining of a code chunk: {r ..., ...}  
+* `echo` - Logical indicating if code should appear in output doc  
+* `results` - Options: 
+  + `"markup"`- default  
+  + `"asis"` - (as is) passthrough results, helpful for showing nice tables  
+```{r results = "asis"}
+library(datasets)
+data(airquality)
+fit <- lm(Ozone ~ Wind + Temp + Solar.R, data = airquality)
+
+library(xtable)
+xt <- xtable(summary(fit))
+print(xt, type = "html")
+```
+  
+  + `"hide"` - do not display results  
+  + `"hold"` - put all results below all code  
+* `warning` - logical indicating if warnings should appear in doc  
+* `eval` - logical indicating if code should be ran  
+* `fig.` - `height` & `width` will adjust the respective dimensions  
+  + for figures knitr will encode the image in HTML, so it is embedded in the actual HTML file  
+* `cache` - Logical indicating if results of computation should be cached
+  + Helpful if a code chunk takes a long time to run  
+  + If set to `TRUE`, after the first run results are loaded from the cache rather than being re-computed every time; if nothing has changed in the chunk  
+  + `FALSE` by default  
+  + Dependencies are not checked explicitly, so if one code chunk depends on results from a previous and the previous is changed the old output will still be recalled from the cache  
+  + Chunks with significant *side effects* may not be cacheable, that is an effect outside the document  
+  
+### Setting Global Options  
+* Sometimes we want to set options for **every** code chunk that are different from the defaults  
+* For example, we may want to suppress all code echoing and results output  
+* we do this with `opts_chunk$set(<put new defaults in here>)`
+
 
 
 **Reminder to commit, delete this line** ***AFTER*** **committing**  
