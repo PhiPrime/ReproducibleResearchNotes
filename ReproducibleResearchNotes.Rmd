@@ -734,11 +734,9 @@ print(xt, type = "html")
 * For example, we may want to suppress all code echoing and results output  
 * we do this with `opts_chunk$set(<put new defaults in here>)`
 
-
-
-**Reminder to commit, delete this line** ***AFTER*** **committing**  
-
 # Course Project 1  
+**[My project can be found on GitHub](https://github.com/PhiPrime/Activity_Data_Report_Proj_1)**
+
 
 **Reminder to commit, delete this line** ***AFTER*** **committing**  
 
