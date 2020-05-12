@@ -1034,12 +1034,154 @@ Possibly a curated library of Data Analysis
 * Gives reviewers an important tool without dramatically increasing the burden on them  
 * More effort should be put into improving the quality of "upstream" aspects of scientific research  
 
-
-**Reminder to commit, delete this line** ***AFTER*** **committing**  
-
 # Case Studies & Commentaries  
 ## Caching Computations  
+### Literate (Statistical) Programming  
+* An article is a stream of **text** and **code**  
+* Analysis code is divided into text and code "chunks"  
+* Each code chunk loads data and computes results  
+* Presentation code formats results (tables, figures, etc.)  
+* Article text explains what is going on  
+* Literate programs can be: 
+  + **weaved** to produce human-readable documents; and 
+  + **tangled** to produce machine-readable documents  
+* Literate programming is a general concept that requires  
+  1) A documentaion language (human readdable)  
+  2) A programming language (machine readable)  
+* Sweave uses LaTeX and R as the documentation and programming languages  
+* Sweave was developed by Friedrich Leisch (member of the R Core) and is maintained by R core  
+* Links:  
+  + **[Wikipedia](http://www.statistik.lmu.de/~leisch/Sweave)**  
+  + **[RStudio Support](https://support.rstudio.com/hc/en-us/articles/200552056-Using-Sweave-and-knitr)**  
+* Alternatives to LaTeX/R exist, such as HTML/R (package R2HTML) and ODF/R (package odfWeave)  
+* An idea proposed by Peng is to store the *Analytic Data* and *Computational Results* in a database for the reader  
+
+![Research Pipeline](./Images/research_pipeline.png)
+
+* To store these results we want to cache them  
+
+### The `cacher` package for R  
+* Add-on package for R  
+* Evaluates code written in fields and stores intermediate results in a key-value database  
+* R expressions are given SHA-1 hash values so that changes can be tracked and code reevaluated if necessary  
+  + SHA - Secure Hash Algorithm  
+  + **[Wikipedia page on SHA-1](https://en.wikipedia.org/wiki/SHA-1)**   
+  + **[Computerphile video on SHA-1](https://youtu.be/DMtFhACPnTY)**  
+  + Changes are tracked by comparing new and stored hash values  
+* "Cacher packages" can be built for distribution to public  
+* Others can "clone" an analysis and evaluate subsets of code or inspect data objects depending on what part of the analysis they want to examine  
+  
+Using `cacher` as an Author  
+1) Parse the R source file; Create the necessary cache directories and subdirectories  
+2) Cycle through each expression in the source file:  
+  + If an expression has never been evaluated, evaluate it and store any resulting R objects in the cache database  
+  + If a cached result exists, lazy-load the results from the cache database and move to the next expression  
+  + If an expression does not create any R objects (i.e., there is nothing to cache), add the expression to the list of expressions where evaluation needs to be forced  
+  + Write out metadata for this expression to the metadata file.  
+* The `cachepackage` function creates a `cacher` package storing  
+  + Source file  
+  + Cached data objects  
+  + Metadata  
+* Package file is zipped and can be distributed  
+* Readers can unzip the file and immediately investigate its contents via `cacher` package  
+
+![Example: Simple Analysis](./Images/cacher_example.png)
+
+### Using `cacher` as a Reader  
+A journal article says:  
+"*...the code and data for this analysis can be found in the cacher package 092dcc7dda4b93e42f23e038a60e1d44dbec7b3f.*"  
+
+Note: `cacher` package is out-dated, I briefly looked for alternatives but didn't find anything. I'll just include the information for `cacher` anyway in case this proves useful at some point  
+```{r eval = FALSE}
+library(cacher)
+clonecache(id = "092dcc7dda4b93e42f23e038a60e1d44dbec7b3f")
+sourcefile("top20.R")
+```
+
+### Cloning an Analysis  
+* Local directories created  
+* Source code files and metadata are downloaded  
+* Data objects are *not* downloaded by default (As they may be large)  
+* References to data objects are loaded and corresponding data can be lazy-loaded on demand  
+
+![Tracing Code Backwards](./Images/cacher_ex.png)
+* `cacher` would use this list from `objectcode` to then create a graph showing how data was generated  
+
+![cacher Graph](./Images/cacher_graph_ex.png)  
+  
+Running Code  
+* The `runcode` function executes code in the source file  
+* By default, expressions that results in an object being created are *not* run and the resulting objects are laxy-loaded into the workspace  
+* Expressions not resulting in objects are evaluated  
+
+Checking Code and Objects  
+* The `checkcode` function evaluates all expressions from scratch (no lazy-loading)  
+* Results of evaluation are checked against stored results to see if the results are the same as what the author calculated  
+  + Setting RNG seeds is critical for this to work  
+* The integrity of data objects can be verified with the `checkobjects` function to check for possible corruption of data (i.e. in transit)  
+
+![Inspecting Data Objects](./Images/cacher_inspect_objs.png)
+
+### `cacher` Summary  
+* The `cacher` package *was able to* be used by authors to create cache pacckages from data analyses for distribution  
+* Readers *were able to* use the `cacher` package to inspect others' data analyses by examining cached computations  
+* `cacher` is mindful of readers' resources and efficiently loads only those data object that are needed
+
 ## Case Study: Air Pollution  
+### What Causes Particulate Matter to be Toxic?  
+* PM is composed of many different chemical elements  
+* Some components of PM may be mroe harmful than others  
+* Some sources of PM may be more dangerous than others  
+* Identifying harmful chemical constituents may lead us to strategies for controlling sources of PM  
+
+### National Morbidity, Mortality, and Air Pollution Study  
+* The National Morbidity, Mortality, and Air Pollution Study (NMMAPS) was a national study of the short-term health effects of ambient air pollution  
+* Focused primarily on particulate matter (PM~10~) and ozone (O~3~)  
+* Health outcomes included mortality from all causes and hospitalizations for cardiovascular and respiratory diseases  
+* Key publications  
+  + **[Study](http://www.ncbi.nlm.nih.gov/pubmed/11098531)**
+  + **[Study](http://www.ncbi.nlm.nih.gov/pubmed/11354823)**
+* Funded by the **[Health Effects Institute](https://www.healtheffects.org/)**  
+  + Roger Peng currently serves on the Health Effects Institute Health Review Committee  
+  
+Reproducibility of NMMAPS  
+* Data made available at **[the Internet-based Health and Air Pollution Surveillance System](https://www.jhsph.edu/departments/biostatistics/)**  
+* Research results and software also available at iHAPSS  
+* Many studies (over 67 published) have been conducted based on **[the public data](http://www.ncbi.nlm.nih.gov/pubmed/22475833)**  
+* Has served as an important test bed for methodological development  
+
+### What Causes Particulate Matter to be Toxic?  
+* An example of this is from **[a study about the effects of nickel in ambient air](http://www.ncbi.nlm.nih.gov/pmc/articles/PMC1665439)**  
+* Lippmann *et al.* found strong evidence that Ni modified the short-term effect of *PM~10~* across 60 US communities  
+  + Communities with higher concentration of Ni in the air had worse health risks from PM~10~  
+* No other PM chemical constituent seemed to have the same modifying effect  
+  
+Too simple to be true?  
+* **[This study looked to reproduce the findings](http://www.ncbi.nlm.nih.gov/pmc/articles/PMC2137127/)**  
+* This study reexamines the data from NMMAPS and links it with PM chemcial constituent data, adding in to look at Vanadium (One of my fav. elements btw)  
+* One of the cities in the US with high levels of Nickel is NYC, so this study looks to see if this is a cofactor of the results  
+
+![Does Nickel Make PM Toxic?](./Images/NYC_outliers.png)
+  
+* A regression line with these outliers shows a positive regression line that is statistically significant (p < 0.01)    
+* However, with the outliers (NYC) removed the regression line is no longer statistically significant (p < 0.31)  
+  
+* They also recommputed the regression line by removing a community and recomputing. Only when removing NYC did the regression line greatly change  
+
+![Removing Communities](./Images/removing_communities.png)
+  
+### What Have We Learned From These Studies?  
+* New York does have very high levels of nickel and vanadium, much higher than any other US community  
+* There is evidence of a positive relationship between Ni concentrations and PM~10~ risk  
+* The strength of this relationship is highly sensitive to the observations from New York City  
+* Most of the information in the data is derived from just 3 observations  
+  
+* Reproducibility of NMMAPS allowed for a secondary analysis (and linking with PM chemical constituent data) investigating a novel hypothesis (Lippmann *et al.*)  
+* Reproducibility alsoa llowed for a critique of that new analysis and some additional new analysis (Dominici *et al.*)  
+* Original hypothesis not necessarily invalidated, but evidence not as strong as originally suggested (as such more work should be done)  
+* Reproducibility allows for the scientific discussion to occur in a timely and informed manner  
+* This is how science works  
+
 
 **Reminder to commit, delete this line** ***AFTER*** **committing**  
 
@@ -1049,6 +1191,6 @@ Possibly a curated library of Data Analysis
 **Reminder to commit, delete this line** ***AFTER*** **committing**  
 
 # Course Project 2
-
+**[My project can be found on GitHub](https://github.com/PhiPrime)**
 
 **Reminder to commit, delete this line** ***BEFORE*** **committing**  
