@@ -1183,10 +1183,106 @@ Too simple to be true?
 * This is how science works  
 
 
-**Reminder to commit, delete this line** ***AFTER*** **committing**  
-
 ## Case Study: High Throughput Biology  
+* This lecture features Keith Baggerly, a professor at the Biostatistics and Bioinformatics Department at the MD Anderson Cancer Center.  
+* In this lecture he covers "*The Duke Saga*"  
+  
+* Our intuiton about what "makes sense" is very poor in high dimensions. To use "genommic signatures" as biomarkers, we need to know they've been assembeled correctly.  
+  + Without documentation, we may need to employ *forensic bioinformatics* to infer what was done to obtain the given results  
+
+* The paper was **[Genomic signatures to guide the use of chemotherapeutics, Potti et al (2006)](https://www.nature.com/articles/nm1491)** and has since been retracted  
+  + The main conclusion was that we can use microarray data from cell lines (the **[NCI60](https://en.wikipedia.org/wiki/NCI-60)**) to define drug response "signatures", which could be used to predict whether patients will respond to a given chemotherapy agent.  
+  + This got people at the Muscular Dystrophy Association (MDA) very excited  
+When attempting to reproduce the following plot was made:  
+![Replication Plot](./Images/replication_plot.png)
+In this plot, the green (right side) and the red (left side) represent the **training** dataset. The blue and gold points represent the **test** set, and you can see that the blue and gold points are not very well-separated.  
+
+On thinking they did something wrong the Anderson center further investigated  
+* In the orginial study hey created a heatmap using 2-sample-t-tests to find the 45 genes that showed the most correlation to resistance. Baggerly attempted to replicate this study and also found 45 best describing genes. They then made a heatmap of the OG data with these given genes and found... garbage  
+
+![5-FU Heatmaps](./Images/5FU_Heatmaps.png)
+
+Baggerly then matched their genes with the reported genes from the OG paper and found...
+
+![Comparing Genes](./Images/off_by_one.png)
+  
+... an "off by one" error. This error was then tied to the software used, which requried a file with *the list of probeset ids* be given that did not have a header. If a header was present the header would be at index `0`  
+
+This was only looking at one drug, so they reproduced the heatmaps by implmenting an "off by one" error for the others drugs and most matched exactly  
+![Heatmaps of other drugs](./Images/other_drug_heatmaps.png)   
+
+They matched the heatmaps, but not the gene lists.  
+
+They did a few more tests resulting in more descrepencies then wrote to Nature Medicine pointing out these flaws. The response was to claim their analysis was wrong, and stick with the original paper. However other organizations were able to reproduce the results of Baggerly  
+
+Baggerly & Co. checked the correlations of individual pairs of elements, which should be 1:1. If all were done correctly, the plot should only have red points on the diagonal of the square. That would mean that each column in the dataset, which represents different samples in the study, is correlated with itself but not correlated with another sample. There should be no red points off of the main diagonal.. however:
+
+![Correlations of Samples](./Images/independent_sampling_test.png)
+
+Turns out not all the samples were distint and rather some were reused multiple times, with only **84** distinct samples  
+
+In response Baggerly & Co. sent a letter to Nature Medicine who forwarded this one to the authors. The authors then redid the study and still returned great results "using only the **95** unique samples" c(-_-c) "95"??  
+
+They released the 95 samples and it was seen that many were duplicated or listed as *both* resistant and sensitive  
+
+###Timeline  
+**Prior**: Over 5 papers reported errors with the OG study  
+**June 2009**: Baggerly & Co. learn clinical trials had begun based on this flawed evidence  
+**Sep 14th**: Paper describing errors was avaliable online at *Annals of Applied Statistics*  
+**Sep-Oct**: Story covered by *The Cancer Letter*; Duke starts an internal investigation and suspends trials  
+**Jan 2010**: Duke descides to restart the trials stating that the invesigation "*strengthen ... confidence in this evolving approach to personalized cancer treatment*"  
+  
+* Baggerly & Co. wrote to duke requesting the data to which Duke responded: "*While the reviewers approved of our sharing the reprot with the National Cancer Institute (NCI), we consider it a confidential document*" and that a future paper will explain the methods  
+
+**mid-Nov 2009**: (While mid-investigation), the Duke team posted new data for cisplatin and pemetrexed. The included quantifications for 59 ovarian cancer test samples (from GSE3149) used for predictor validation.  
+  * When trying to see how the samples matched up they produced the following plot, showing that **none** of the samples matched up, either mislabled (43) or not matching at all (16)  
+![Pairwise Correlations of Sample Matches](./Images/ovarian_samples_correlation.png)
+  
+**April 7th 2010**: Since NCI is a federally funded institution they are subject to the freedom of information act, as such Paul Goldberg of *the Cancer Letter* requested "access to and copies of the report (and attendant data)"  
+
+**May 3rd 2010**: A redacted report was supplied  
+* The review panel had stated "we were unable to identify a place where the statistical methods were described in sufficient detail to independently replicate the findings of the papers"  
+* The report makes no mention of the problems with cisplatin/pemetrexed that arose during the investigation  
+  
+**May 14th 2010**: NCI raised new question about Duke Genomics Research, Cuts Assay from trial. The NCI doesn't directly sponsor the resumed trials.  
+
+**July 16th 2010**: It is found Assay's claim (a major scientist in the OG study)to being a Rhodes Scholar was fabricated. Shortly thereafter Duke resuspends the trials    
+
+### Some Observations  
+*The most common mistakes are simple*  
+* Confounding in the Experimental Design  
+* Mixing up the sample labels  
+* Mixing up the gene labels  
+* Mixing up the group labels  
+  + (Most mixups involve simple switches or offsets)  
+*This simplicity is often hidden*  
+* Incomplete documentation  
+***The most simple mistakes are common***   
+
+What should the norm be?  
+Things we look for in papers:
+1) Data (often mentioned, given Minimum Information About a Microarray Experiment (**[MIAME](https://en.wikipedia.org/wiki/Minimum_information_about_a_microarray_experiment)**))  
+2) Provenance  
+3) Code  
+4) Descriptions of Nonscriptable Steps  
+5) Descriptions of Planned Design, if used.
+
+Some Lessons:  
+* It should be asked "*Is our own work reproducible?*"  
+* *Literate Programming* should be used to help in reproduciblity  
+* *Reusing Templates*  
+* *Report Structure*  
+* *Executive Summaries*  
+* *Appendices* - Some things we want to know all the time: *SessionInfo*, *Saves*, and *File Location*.  
+* Biggest thing is to have ***Reproducible Research***  
+
+See Also: **[Annals of Applied Statistics! Baggerely and Coombes (2009)](http://bioinformatics.mdanderson.org/Supplements/ReproRsch-All)
+
+
 ## Commentaries on Data Analysis  
+Peng & Leek have written a commentary on Data Analysis which **[has been included as a pdf here](./Resources/1502.03169.pdf)**  
+
+
 
 **Reminder to commit, delete this line** ***AFTER*** **committing**  
 
