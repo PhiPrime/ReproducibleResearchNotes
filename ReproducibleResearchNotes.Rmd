@@ -1,7 +1,7 @@
 ---
 title: "Reproducible Research Notes"
 author: "Coursera Course by John Hopkins University"
-date: "INSTRUCTORS: Dr. Jeff Leek, Dr. Roger D. Peng, Dr. Brian Caffo"
+date: "INSTRUCTORS: Dr. Roger D. Peng, Dr. Jeff Leek, Dr. Brian Caffo"
 fontsize: 11pt
 output: 
         pdf_document:
@@ -1284,9 +1284,7 @@ Peng & Leek have written a commentary on Data Analysis which **[has been include
 
 
 
-**Reminder to commit, delete this line** ***AFTER*** **committing**  
-
 # Course Project 2
-**[My project can be found on GitHub](https://github.com/PhiPrime)**
+**[My project can be found on GitHub](https://github.com/PhiPrime/Storm_Data_Report_Proj_2)**
 
-**Reminder to commit, delete this line** ***BEFORE*** **committing**  
+
